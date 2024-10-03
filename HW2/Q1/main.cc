@@ -45,7 +45,7 @@ int main() {
 
   }
  
-  integral = integral * region / N;  // multiply by the region of integration, and divide by N
+  integral = integral / N;  // multiply by the region of integration, and divide by N
 
   cout << "The integral is " << integral << endl; 
   return 0;
