@@ -11,10 +11,9 @@ using namespace std;
 
 int main() {
 
-  double start_time, end_time;
-  start_time = omp_get_wtime();
+  double start_time = omp_get_wtime();
 
-  int L = 200;                // matrix size  
+  int L = 4000;                 // matrix size  
   Matrix A (L, Row(L, 0.0));  // initialize matrix 
 
   for (int i=0; i<L; i++) {
@@ -30,6 +29,7 @@ int main() {
       }
     }
   }
+  cout << "Initialization complete" << endl;
 
   random_device rd;                           // random number seed 
   mt19937 gen(rd());                          // random number generator 
@@ -40,23 +40,24 @@ int main() {
     y[i] = dis(gen); 
   }
 
-  y = normalize(y); 
-
   int lambda; 
   Row x(L, 0.0);
 
-  int N = 80;  // number of loops for power method 
+  double time1 = omp_get_wtime();
+
+  y = normalize(y);
+
+  int N = 200;  // number of loops for power method 
   for (int n=0; n<N; n++) {
     x = multiplyRowWithMatrix(y, A);
     lambda = norm(x) / norm(y); 
     y = normalize(x); 
   }
+  cout << "Power method done" << endl;
+
+  double time2 = omp_get_wtime();
 
   ofstream outfile("output.txt");
-  if (!outfile) { 
-    cout << "Error opening file." << endl;
-    return 1;
-  }
 
   outfile << "Eigenvalue: " << lambda << endl;
   outfile << "Eigenvector: ";
@@ -66,7 +67,8 @@ int main() {
   outfile << endl;
   outfile.close();
 
-  end_time = omp_get_wtime();
-  cout << "Time: " << end_time - start_time << " seconds." << endl; 
+  double end_time = omp_get_wtime();
+  cout << "Serial Time: " << (end_time-time2) + (time1-start_time) << " seconds." << endl; 
+  cout << "Total time: " << end_time-start_time << " seconds." << endl; 
   return 0;
 }
